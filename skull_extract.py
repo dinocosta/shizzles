@@ -25,8 +25,8 @@ print(ytt.shape)
 
 # (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
-X_train = np.rollaxis(xt.get_data().reshape(xt.shape + (1,)), 2, 0)
-X_test = np.rollaxis(xtt.get_data().reshape(xtt.shape + (1,)), 2, 0)
+X_train = np.rollaxis(xt.get_data().reshape((1,) + xt.shape + (1,)), 3, 1)
+X_test = np.rollaxis(xtt.get_data().reshape((1,) + xtt.shape + (1,)), 3, 1)
 
 Y_train = np.rollaxis(yt.get_data(), 2, 0)
 Y_test = np.rollaxis(ytt.get_data(), 2, 0)
