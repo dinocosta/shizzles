@@ -28,7 +28,6 @@ for lf in loaded_files:
 max_width = max(shapes_width)
 max_height = max(shapes_height)
 
-
 for i in range(3):
     exam = loaded_files[i].get_data()
     exam = np.rollaxis(exam, 2) #put frames at index 0
