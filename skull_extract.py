@@ -1,6 +1,6 @@
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten, ZeroPadding3D
+from keras.layers import Dense, Dropout, Activation, Flatten, ZeroPadding2D
 from keras.layers import Convolution2D, MaxPooling2D, Convolution3D, MaxPooling3D
 from keras.utils import np_utils
 from keras.datasets import mnist
@@ -23,20 +23,22 @@ print(yt.shape)
 print(xtt.shape)
 print(ytt.shape)
 
-X_train = np.rollaxis(xt.get_data(), 2).reshape(200, 44176)
-Y_train = np.rollaxis(yt.get_data(), 2).reshape(200, 44176)
- 
+X_train = np.rollaxis(xt.get_data(), 2).reshape(200, 176, 251, 1)
+Y_train = np.rollaxis(yt.get_data(), 2).reshape(200, 176, 251, 1)
+# X_test = np.rollaxis(xtt.get_data(), 2).reshape(200, 44176)
+# Y_test = np.rollaxis(ytt.get_data(), 2).reshape(200, 44176)
+
 model = Sequential()
-model.add(Dense(5000, input_shape=(44176,)))
-model.add(Activation('relu'))
-model.add(Dropout(0.2))
-model.add(Dense(10000))
-model.add(Activation('relu'))
-model.add(Dropout(0.2))
-model.add(Dense(44176))
-# model.add(ZeroPadding3D(padding=(1, 1, 1), dim_ordering='default', input_shape=(200, 176, 251, 1)))
+model.add(ZeroPadding2D(padding=(2, 2), dim_ordering='default', input_shape=(176, 251, 1)))
+model.add(Convolution2D(32, 3, 3, activation="relu"))
+model.add(Convolution2D(64, 3, 3, activation="relu"))
+model.add(Dense(1))
+#model.add(Dropout(0.2))
+#model.add(Dense(10000))
+#model.add(Activation('relu'))
+#model.add(Dropout(0.2))
+#model.add(Dense(44176))
 # 
-# model.add(Convolution3D(1, 3, 3, 3, activation="relu" ))
  
 # Declare the loss function and the optimizer
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
@@ -45,5 +47,5 @@ model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 model.fit(X_train, Y_train, batch_size=3, nb_epoch=1, verbose=1)
 # 
 # # Evaluate model
-score = model.evaluate(X_test, Y_test, verbose=0)
-print(score)
+# score = model.evaluate(X_test, Y_test, verbose=0)
+# print(score)
