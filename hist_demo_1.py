@@ -24,20 +24,6 @@ for i in range(len(train_images)):
     image_equalized = np.interp(image, bins[:-1], cdf)
     train_images[i] = image_equalized
 
-# This code normalizes brightness values between 0 and 255
-
-# for i in range(len(train_images)):
-#     tmp = np.floor(train_images[i])
-#     tmp /= np.max(tmp)
-#     tmp *= 255
-#     tmp = np.array(tmp, dtype=np.int16)
-#     train_images[i] = tmp
-
-# for i in range(len(train_images)):
-#     tmp = train_images[i] * 255.0
-#     new_img, h, new_h, sk = histogram_equalization(tmp)
-#     train_images[i] = new_img
-
 # To get the image back to a state where it can be written to disk we roll the axis again.
 
 train_images_to_disk = np.rollaxis(train_images, 0, 3)
