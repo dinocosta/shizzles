@@ -1,1 +1,4 @@
 *.nii.gz
+*.swp
+__pycache__/
+*.py[cod]
