@@ -17,7 +17,7 @@ masks = []
 # Load
 files_list = sorted(os.listdir("/home/dl_skull/normalized_images"))
 # for i in range(len(files_list)):
-for i in range(50):
+for i in range(98):
     file = "/home/dl_skull/normalized_images/" + files_list[i]
     file = nib.load(file)
     file = file.get_data()
@@ -26,19 +26,19 @@ for i in range(50):
     else:
         masks.append(file)
 
-xt = np.concatenate(mris[0:15], 2)
+xt = np.concatenate(mris[0:35], 2)
 print(xt.shape)
-yt = np.concatenate(masks[0:15], 2)
+yt = np.concatenate(masks[0:35], 2)
 print(yt.shape)
-xtt = np.concatenate(mris[15:], 2)
+xtt = np.concatenate(mris[35:], 2)
 print(xtt.shape)
-ytt = np.concatenate(masks[15:], 2)
+ytt = np.concatenate(masks[35:], 2)
 print(ytt.shape)
 
-X_train = np.rollaxis(norm.normalize_image(xt), 2).reshape(2967, 176, 256, 1)
-Y_train = np.rollaxis(norm.normalize_image(yt), 2).reshape(2967, 176, 256, 1)
-X_test = np.rollaxis(norm.normalize_image(xtt), 2).reshape(1945, 176, 256, 1)
-Y_test = np.rollaxis(norm.normalize_image(ytt), 2).reshape(1945, 176, 256, 1)
+X_train = np.rollaxis(norm.normalize_image(xt), 2).reshape(xt.shape[2], 176, 256, 1)
+Y_train = np.rollaxis(norm.normalize_image(yt), 2).reshape(yt.shape[2], 176, 256, 1)
+X_test = np.rollaxis(norm.normalize_image(xtt), 2).reshape(xtt.shape[2], 176, 256, 1)
+Y_test = np.rollaxis(norm.normalize_image(ytt), 2).reshape(ytt.shape[2], 176, 256, 1)
 
 model = Sequential()
 model.add(ZeroPadding2D(padding=(2, 2), dim_ordering='default', input_shape=(176, 256, 1)))
@@ -60,4 +60,4 @@ model.fit(X_train, Y_train, batch_size=3, nb_epoch=1, verbose=1)
  
 # Evaluate model
 score = model.evaluate(X_test, Y_test, verbose=0)
-# print(score)
+print(score)
