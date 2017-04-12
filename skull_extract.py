@@ -17,7 +17,7 @@ masks = []
 # Load
 files_list = sorted(os.listdir("/home/dl_skull/normalized_images"))
 # for i in range(len(files_list)):
-for i in range(98):
+for i in range(200):
     file = "/home/dl_skull/normalized_images/" + files_list[i]
     file = nib.load(file)
     file = file.get_data()
@@ -26,13 +26,13 @@ for i in range(98):
     else:
         masks.append(file)
 
-xt = np.concatenate(mris[0:35], 2)
+xt = np.concatenate(mris[0:60], 2)
 print(xt.shape)
-yt = np.concatenate(masks[0:35], 2)
+yt = np.concatenate(masks[0:60], 2)
 print(yt.shape)
-xtt = np.concatenate(mris[35:], 2)
+xtt = np.concatenate(mris[60:], 2)
 print(xtt.shape)
-ytt = np.concatenate(masks[35:], 2)
+ytt = np.concatenate(masks[60:], 2)
 print(ytt.shape)
 
 X_train = np.rollaxis(norm.normalize_image(xt), 2).reshape(xt.shape[2], 176, 256, 1)
