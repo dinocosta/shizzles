@@ -28,15 +28,18 @@ for lf in loaded_files:
 max_width = max(shapes_width)
 max_height = max(shapes_height)
 
+
 for i in range(3):
     exam = loaded_files[i].get_data()
     exam = np.rollaxis(exam, 2) #put frames at index 0
-    new_exam = np.empty((0, max_width, max_height), dtype=np.int16)
+    new_exam = np.zeros((0, max_width, max_height), dtype=np.int16)
     for cut in exam:
-        new_cut = np.empty((0,max_height), dtype=np.int16)
+        new_cut = np.zeros((0,max_height), dtype=np.int16)
         for line in cut:
             new_line = np.resize(line, (max_height,))
             new_cut = np.append(new_cut, [new_line], axis=0)
+        for i in range(max_width - exam.shape[1]):
+            new_cut = np.append(new_cut, [np.zeros((max_height,), dtype=np.int16)], axis=0)
         new_exam = np.append(new_exam, [new_cut], axis=0)
 
     new_exam = np.rollaxis(new_exam,0,3)
