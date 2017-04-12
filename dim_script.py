@@ -12,7 +12,7 @@ import nibabel as nib
 from nibabel.testing import data_path
 
 # List files
-files_list = os.listdir("/mnt/disk3/datasets_rm/data_set_skull")
+files_list = sorted(os.listdir("/mnt/disk3/datasets_rm/data_set_skull"))
 for i in range(len(files_list)):
     files_list[i] = "/mnt/disk3/datasets_rm/data_set_skull/" + files_list[i]
 # Load
@@ -28,7 +28,7 @@ for lf in loaded_files:
 max_width = max(shapes_width)
 max_height = max(shapes_height)
 
-for i in range(3):
+for i in range(50):
     exam = loaded_files[i].get_data()
     exam = np.rollaxis(exam, 2) #put frames at index 0
     new_exam = np.zeros((0, max_width, max_height), dtype=np.int16)

@@ -7,32 +7,41 @@ from keras.datasets import mnist
 from matplotlib import pyplot as plt
 import normalization as norm
 
-
 # NIFTI
 import os
 import nibabel as nib
 from nibabel.testing import data_path
+
+mris = []
+masks = []
 # Load
-X_train = '/home/dl_skull/ex1.nii.gz'
-Y_train = '/home/dl_skull/ex1-res.nii.gz'
-X_test = '/home/dl_skull/ex2.nii.gz'
-Y_test = '/home/dl_skull/ex2-res.nii.gz'
+files_list = sorted(os.listdir("/home/dl_skull/normalized_images"))
+# for i in range(len(files_list)):
+for i in range(50):
+    file = "/home/dl_skull/normalized_images/" + files_list[i]
+    file = nib.load(file)
+    file = file.get_data()
+    if (i%2==0):
+        mris.append(file)
+    else:
+        masks.append(file)
 
-[xt, yt, xtt, ytt] = map(nib.load, [X_train, Y_train, X_test, Y_test])
-[xt, yt, xtt, ytt] = map(norm.normalize_image, [xt, yt, xtt, ytt])
-
+xt = np.concatenate(mris[0:15], 2)
 print(xt.shape)
+yt = np.concatenate(masks[0:15], 2)
 print(yt.shape)
+xtt = np.concatenate(mris[15:], 2)
 print(xtt.shape)
+ytt = np.concatenate(masks[15:], 2)
 print(ytt.shape)
 
-X_train = np.rollaxis(xt.get_data(), 2).reshape(200, 176, 251, 1)
-Y_train = np.rollaxis(yt.get_data(), 2).reshape(200, 176, 251, 1)
-# X_test = np.rollaxis(xtt.get_data(), 2).reshape(200, 44176)
-# Y_test = np.rollaxis(ytt.get_data(), 2).reshape(200, 44176)
+X_train = np.rollaxis(norm.normalize_image(xt), 2).reshape(2967, 176, 256, 1)
+Y_train = np.rollaxis(norm.normalize_image(yt), 2).reshape(2967, 176, 256, 1)
+X_test = np.rollaxis(norm.normalize_image(xtt), 2).reshape(1945, 176, 256, 1)
+Y_test = np.rollaxis(norm.normalize_image(ytt), 2).reshape(1945, 176, 256, 1)
 
 model = Sequential()
-model.add(ZeroPadding2D(padding=(2, 2), dim_ordering='default', input_shape=(176, 251, 1)))
+model.add(ZeroPadding2D(padding=(2, 2), dim_ordering='default', input_shape=(176, 256, 1)))
 model.add(Convolution2D(32, 3, 3, activation="relu"))
 model.add(Convolution2D(64, 3, 3, activation="relu"))
 model.add(Dense(1))
@@ -48,7 +57,7 @@ model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
  
 # Train model
 model.fit(X_train, Y_train, batch_size=3, nb_epoch=1, verbose=1)
-# 
-# # Evaluate model
-# score = model.evaluate(X_test, Y_test, verbose=0)
+ 
+# Evaluate model
+score = model.evaluate(X_test, Y_test, verbose=0)
 # print(score)
