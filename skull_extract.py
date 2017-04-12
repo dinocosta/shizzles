@@ -5,6 +5,8 @@ from keras.layers import Convolution2D, MaxPooling2D, Convolution3D, MaxPooling3
 from keras.utils import np_utils
 from keras.datasets import mnist
 from matplotlib import pyplot as plt
+import normalization as norm
+
 
 # NIFTI
 import os
@@ -17,6 +19,7 @@ X_test = '/home/dl_skull/ex2.nii.gz'
 Y_test = '/home/dl_skull/ex2-res.nii.gz'
 
 [xt, yt, xtt, ytt] = map(nib.load, [X_train, Y_train, X_test, Y_test])
+[xt, yt, xtt, ytt] = map(norm.normalize_image, [xt, yt, xtt, ytt])
 
 print(xt.shape)
 print(yt.shape)
