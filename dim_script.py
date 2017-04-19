@@ -1,12 +1,4 @@
 import numpy as np
-#from keras.models import Sequential
-#from keras.layers import Dense, Dropout, Activation, Flatten
-#from keras.layers import Convolution2D, MaxPooling2D, Convolution3D, MaxPooling3D
-#from keras.utils import np_utils
-#from keras.datasets import mnist
-#from matplotlib import pyplot as plt
-
-# NIFTI
 import os
 import nibabel as nib
 from nibabel.testing import data_path
@@ -15,6 +7,7 @@ from nibabel.testing import data_path
 files_list = sorted(os.listdir("/mnt/disk3/datasets_rm/data_set_skull"))
 for i in range(len(files_list)):
     files_list[i] = "/mnt/disk3/datasets_rm/data_set_skull/" + files_list[i]
+
 # Load
 loaded_files = list(map(nib.load, files_list))
 
