@@ -48,7 +48,7 @@ model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
  
 # Train model
-history = model.fit(mris, masks, batch_size=3, nb_epoch=1, verbose=1, validation_split=0.2)
+history = model.fit(mris, masks, batch_size=3, nb_epoch=5, verbose=1, validation_split=0.2)
 
 # Save Model
 timestamp = time.strftime("%Y%m%d-%H%M%S")
