@@ -5,6 +5,7 @@ from keras.layers import Convolution2D, MaxPooling2D, Convolution3D, MaxPooling3
 from keras.utils import np_utils
 from keras.datasets import mnist
 from matplotlib import pyplot as plt
+import time
 import normalization as norm
 
 # NIFTI
@@ -14,50 +15,47 @@ from nibabel.testing import data_path
 
 mris = []
 masks = []
-# Load
+# Load images
+# Splits mris from their masks by ordering and filtering odd from even
 files_list = sorted(os.listdir("/home/dl_skull/normalized_images"))
-# for i in range(len(files_list)):
-for i in range(200):
-    file = "/home/dl_skull/normalized_images/" + files_list[i]
-    file = nib.load(file)
-    file = file.get_data()
-    if (i%2==0):
+for i in range(len(files_list)):
+    filepath = "/home/dl_skull/normalized_images/" + files_list[i]
+    file = nib.load(filepath).get_data()
+    # Masks are named _bet_mask so they are ordered first
+    if (i%2==1):
         mris.append(file)
     else:
         masks.append(file)
 
-xt = np.concatenate(mris[0:60], 2)
-print(xt.shape)
-yt = np.concatenate(masks[0:60], 2)
-print(yt.shape)
-xtt = np.concatenate(mris[60:], 2)
-print(xtt.shape)
-ytt = np.concatenate(masks[60:], 2)
-print(ytt.shape)
+# Concatenate exams on the samples axis
+mris = np.concatenate(mris, 2)
+masks = np.concatenate(masks, 2)
 
-X_train = np.rollaxis(norm.normalize_image(xt), 2).reshape(xt.shape[2], 176, 256, 1)
-Y_train = np.rollaxis(norm.normalize_image(yt), 2).reshape(yt.shape[2], 176, 256, 1)
-X_test = np.rollaxis(norm.normalize_image(xtt), 2).reshape(xtt.shape[2], 176, 256, 1)
-Y_test = np.rollaxis(norm.normalize_image(ytt), 2).reshape(ytt.shape[2], 176, 256, 1)
+# Order the dimensions to have (samples, rows, cols, channels)
+mris = np.rollaxis(norm.normalize_image(mris), 2).reshape(mris.shape[2], 176, 256, 1)
+masks = np.rollaxis(norm.normalize_image(masks), 2).reshape(masks.shape[2], 176, 256, 1)
 
 model = Sequential()
-model.add(ZeroPadding2D(padding=(2, 2), dim_ordering='default', input_shape=(176, 256, 1)))
+model.add(ZeroPadding2D(padding=(2, 2), input_shape=(176, 256, 1)))
 model.add(Convolution2D(32, 3, 3, activation="relu"))
+model.add(Dropout(0.2))
 model.add(Convolution2D(64, 3, 3, activation="relu"))
+model.add(Dropout(0.2))
+model.add(Dense(16))
 model.add(Dense(1))
-#model.add(Dropout(0.2))
-#model.add(Dense(10000))
-#model.add(Activation('relu'))
-#model.add(Dropout(0.2))
-#model.add(Dense(44176))
-# 
  
 # Declare the loss function and the optimizer
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
  
 # Train model
-model.fit(X_train, Y_train, batch_size=3, nb_epoch=1, verbose=1)
- 
-# Evaluate model
-score = model.evaluate(X_test, Y_test, verbose=0)
-print(score)
+history = model.fit(mris, masks, batch_size=3, nb_epoch=1, verbose=1, validation_split=0.2)
+
+# Save Model
+timestamp = time.strftime("%Y%m%d-%H%M%S")
+model.save("logs/"+ timestamp + ".h5")
+
+# Log results
+#with open("logs/log.txt", "a") as myfile:
+#        myfile.write(timestamp)
+#        myfile.write("Loss:" + history.history['loss'][-1])
+#        myfile.write("Acc:" + history.history['accuracy'][-1])
