@@ -26,7 +26,7 @@ for i in range(len(files_list)):
         masks    = np.rollaxis(nib_file.get_data(), 2)
         results  = np.array([])
         aux      = filepath.split('/')
-        r_file   = 'masks_results/' + aux[len(aux) - 1] + '.txt'
+        r_file   = 'masks_results/class_' + aux[len(aux) - 1].replace('_bet_mask', '') + '.txt'
 
         for j in range(len(masks)):
             if (np.max(masks[j]) != 0):
