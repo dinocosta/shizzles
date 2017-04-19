@@ -55,7 +55,7 @@ timestamp = time.strftime("%Y%m%d-%H%M%S")
 model.save("logs/"+ timestamp + ".h5")
 
 # Log results
-#with open("logs/log.txt", "a") as myfile:
-#        myfile.write(timestamp)
-#        myfile.write("Loss:" + history.history['loss'][-1])
-#        myfile.write("Acc:" + history.history['accuracy'][-1])
+with open("logs/log.txt", "a") as myfile:
+        myfile.write(timestamp + "\n")
+        myfile.write("Loss: {}\n".format(history.history['loss'][-1]))                                                            
+	myfile.write("Acc: {}".format(history.history['acc'][-1]))
