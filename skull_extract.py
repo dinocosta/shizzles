@@ -22,10 +22,10 @@ for i in range(len(files_list)):
     filepath = "/home/dl_skull/normalized_images/" + files_list[i]
     file = nib.load(filepath).get_data()
     # Masks are named _bet_mask so they are ordered first
-    if (i%2==1):
-        mris.append(file)
-    else:
+		if ('mask' in filepath):
         masks.append(file)
+    else:
+        mris.append(file)
 
 # Concatenate exams on the samples axis
 mris = np.concatenate(mris, 2)
