@@ -4,6 +4,7 @@ from keras.layers import Dense, Dropout, Activation, Flatten, ZeroPadding2D
 from keras.layers import Convolution2D, MaxPooling2D, Convolution3D, MaxPooling3D
 from keras.utils import np_utils
 from keras.datasets import mnist
+from keras_diagram import ascii
 from matplotlib import pyplot as plt
 import time
 import sys
@@ -22,15 +23,13 @@ mris_list = sorted(os.listdir("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_tr
 masks_list = sorted(os.listdir("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/masks"))
 
 print("Loading MRI's...")
-#for i in range(len(mris_list)):
-for i in range(2):
+for i in range(len(mris_list)):
     filepath = "/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris/" + mris_list[i]
     file = nib.load(filepath).get_data()
     mris.append(file)
 
 print("Loading masks...")
-#for i in range(len(masks_list)):
-for i in range(2):
+for i in range(len(masks_list)):
     filepath = "/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/masks/" + masks_list[i]
     file = nib.load(filepath).get_data()
     masks.append(file)
