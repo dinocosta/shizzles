@@ -22,24 +22,26 @@ mris = []
 masks = []
 # Load images
 # Splits mris from their masks by ordering and filtering odd from even
-files_list = sorted(os.listdir("/home/dl_skull/normalized_images"))
-#for i in range(len(files_list)):
-for i in range(2):
-    filepath = "/home/dl_skull/normalized_images/" + files_list[i]
+mris_list = sorted(os.listdir("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris"))
+masks_list = sorted(os.listdir("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/masks"))
+
+print("Loading MRI's...")
+for i in range(len(mris_list)):
+    filepath = "/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris/" + mris_list[i]
     file = nib.load(filepath).get_data()
-    # Masks are named _bet_mask so they are ordered first
-    if ('mask' in filepath):
-        masks.append(file)
-    else:
-        mris.append(file)
+    mris.append(file)
+
+print("Loading masks...")
+for i in range(len(masks_list)):
+    filepath = "/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/masks/" + masks_list[i]
+    file = nib.load(filepath).get_data()
+    masks.append(file)
 
 # Concatenate exams on the samples axis
 mris = np.concatenate(mris, 2)
 masks = np.concatenate(masks, 2)
 
 # Order the dimensions to have (samples, rows, cols, channels)
-#mris = np.rollaxis(norm.normalize_image(mris), 2).reshape(mris.shape[2], 176, 256, 1)
-#masks = np.rollaxis(norm.normalize_image(masks), 2).reshape(masks.shape[2], 176, 256, 1)
 mris = np.rollaxis(mris, 2).reshape(mris.shape[2], 176, 256, 1)
 masks = np.rollaxis(masks, 2).reshape(masks.shape[2], 176, 256, 1)
 
@@ -56,7 +58,6 @@ model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
  
 # Train model
-#history = model.fit(mris, masks, batch_size=3, nb_epoch=5, verbose=1, validation_split=0.2)
 history = model.fit(mris, masks, batch_size=3, nb_epoch=1, verbose=1, validation_split=0.2)
 
 p = psutil.Process()
@@ -69,7 +70,6 @@ model.save("logs/"+ timestamp + ".h5")
 
 # Log results
 with open("logs/log.csv", "a") as myfile:
-    #myfile.write(timestamp + "\n")
     myfile.write(",")
     myfile.write("\"" + ascii(model).strip() + "\",")
     myfile.write("{},".format(history.history['loss'][-1]))
