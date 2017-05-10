@@ -34,14 +34,16 @@ def normalize_brightness(image):
         image - The image to be normalized.
 
     Returns:
-        A copy of the image with its brightness values between 0 and 255.
+        A copy of the image with its brightness values between 0 and 1.
     """
     # Voxel intensity normalization
-    img = np.floor(image)
-    img /= np.max(img)
-    img *= 255
-    img = np.array(img, dtype=np.int16)
-    return img
+    if ('mask' not in filename):
+        img = np.floor(image)
+        img /= np.max(img)
+        img = np.array(img)
+        return img
+    else:
+        return image
 
 def normalize_dimension(mri, max_width, max_height):
 
