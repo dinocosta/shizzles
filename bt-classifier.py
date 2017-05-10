@@ -50,11 +50,10 @@ print("Loading MRIs and classes...")
 files_list = sorted(os.listdir(MRIS_PATH))
 for i in range(len(files_list)):
     filepath = MRIS_PATH + '/' + files_list[i]
-    if ('mask' not in filepath):
-        mris.append(nib.load(filepath).get_data())
-        classes.append(np.loadtxt(
-            fname = CLASSES_PATH + 'class_' + files_list[i] + '.txt', 
-            dtype = int))
+    mris.append(nib.load(filepath).get_data())
+    classes.append(np.loadtxt(
+        fname = CLASSES_PATH + 'class_' + files_list[i] + '.txt', 
+        dtype = int))
 
 # Concatenate, roll and reshape mris so shape becames (exams, width, height, depth)
 mris = np.concatenate(mris, 2)
@@ -84,46 +83,47 @@ print('x_test shape: ', test_mris.shape)
 print('y_test shape: ', test_classes.shape)
 
 # Create model.
-# print("Creating model...")
-# 
-# model = Sequential()
-# model.add(Conv2D(
-#     filters     = 32, 
-#     kernel_size = (3, 3), 
-#     activation  = 'relu',
-#     input_shape = (176, 256, 1)))
-# model.add(Conv2D(
-#     filters     = 64, 
-#     kernel_size = (3, 3), 
-#     activation  = 'relu'))
-# model.add(MaxPooling2D())
-# model.add(Dropout(
-#     rate = 0.25))
-# model.add(Dense(
-#     units       = 128, 
-#     activation  = 'relu'))
-# model.add(Dropout(
-#     rate = 0.5))
-# model.add(Dense(
-#     units       = num_classes, 
-#     activation  = 'softmax'))
-# 
-# model.compile(
-#     loss        = 'categorical_crossentropy',
-#     optimizer   = 'adadelta',
-#     metrics     = ['accuracy'])
-# 
-# model.fit(
-#     x               = train_mris, 
-#     y               = train_classes,
-#     batch_size      = batch_size,
-#     epochs          = epochs,
-#     verbose         = 1,
-#     validation_data = (test_mris, test_classes))
-# score = model.evaluate(
-#     x       = test_mris, 
-#     y       = test_classes, 
-#     verbose = 0)
-# 
-# print('Test loss: ', score[0])
-# print('Test accuracy: ', score[1])
+print("Creating model...")
+
+model = Sequential()
+model.add(Conv2D(
+    filters     = 32, 
+    kernel_size = (3, 3), 
+    activation  = 'relu',
+    input_shape = (176, 256, 1)))
+model.add(Conv2D(
+    filters     = 64, 
+    kernel_size = (3, 3), 
+    activation  = 'relu'))
+model.add(MaxPooling2D())
+model.add(Flatten())
+model.add(Dropout(
+    rate = 0.25))
+model.add(Dense(
+    units       = 128, 
+    activation  = 'relu'))
+model.add(Dropout(
+    rate = 0.5))
+model.add(Dense(
+    units       = num_classes, 
+    activation  = 'softmax'))
+
+model.compile(
+    loss        = 'categorical_crossentropy',
+    optimizer   = 'adadelta',
+    metrics     = ['accuracy'])
+
+model.fit(
+    train_mris, 
+    train_classes,
+    batch_size      = batch_size,
+    epochs          = epochs,
+    verbose         = 1,
+    validation_data = (test_mris, test_classes))
+score = model.evaluate(
+    x       = test_mris, 
+    y       = test_classes, 
+    verbose = 0)
+
+print('Test loss: ', score[0])
+print('Test accuracy: ', score[1])
