@@ -1,6 +1,12 @@
 """
+bt-classifier: Brain Tissue Classifier
+
 Neuronal network capable of classifying if brain tissue can be seen on a 
 given MRI image.
+
+There are two classes:
+    0 - No brain tissue can be seen on the MRI image.
+    1 - Brain tissue can be seen on the MRI image.
 """
 
 import numpy as np
@@ -18,7 +24,7 @@ num_classes = 2
 epochs      = 1
 
 # Dataset path.
-DS_PATH = '/mnt/disk3/datasets_rm/data_set_skull'
+MRIS_PATH = '/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris'
 CLASSES_PATH = '/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/classes/'
 
 # Array of exams and array of respective classifications.
@@ -26,21 +32,44 @@ mris    = []
 classes = []
 
 def to_binary_vector(value):
+    """
+    Helper function which converts binary values to class vector.
+
+    Arguments:
+        value - The binary value
+    Returns:
+        Array with the corresponding class
+    """
     if value == 1:
         return [0.0, 1.0]
-    else:
+    else: 
         return [1.0, 0.0]
 
-files_list = sorted(os.listdir(DS_PATH))
+# Load mris and classes
+print("Loading MRIs and classes...")
+files_list = sorted(os.listdir(MRIS_PATH))
 for i in range(len(files_list)):
-    filepath = DS_PATH + '/' + files_list[i]
+    filepath = MRIS_PATH + '/' + files_list[i]
     if ('mask' not in filepath):
-        mris.append(nib.load(filepath))
-        classes.append(np.loadtxt(CLASSES_PATH + 'class_' + files_list[i] + '.txt', dtype=int))
+        mris.append(nib.load(filepath).get_data())
+        classes.append(np.loadtxt(
+            fname = CLASSES_PATH + 'class_' + files_list[i] + '.txt', 
+            dtype = int))
 
-mris = list(map(lambda x: np.rollaxis(x.get_data(), 2), mris))
+# Concatenate, roll and reshape mris so shape becames (exams, width, height, depth)
+mris = np.concatenate(mris, 2)
+mris = np.rollaxis(mris, 2)
+mris = mris.reshape(mris.shape[0], 176, 256, 1)
+
+# Convert class vectors to binary class matrices and concatenate classes
+classes = np.array(list(map(
+    lambda x: list(map(lambda y: to_binary_vector(y), x)), 
+    classes)))
+classes = np.concatenate(classes, 0)
 
 # Divide 80% of the dataset for training and 20% for evaluation.
+print("Dividing dataset...")
+
 ds_size         = len(mris)
 train_size      = int(np.floor(ds_size * 0.8))
 train_mris      = mris[:train_size]
@@ -48,30 +77,53 @@ train_classes   = classes[:train_size]
 test_mris       = mris[train_size:]
 test_classes    = classes[train_size:]
 
-# Convert class vectors to binary class matrices.
-train_classes   = list(map(lambda x: list(map(lambda y: to_binary_vector(y), x)), train_classes))
-test_classes    = list(map(lambda x: list(map(lambda y: to_binary_vector(y), x)), test_classes))
+# Confirm shapes
+print('x_train shape: ', train_mris.shape)
+print('y_train shape: ', train_classes.shape)
+print('x_test shape: ', test_mris.shape)
+print('y_test shape: ', test_classes.shape)
 
 # Create model.
-model = Sequential()
-model.add(Conv2D(32, activation='relu', input_shape=(mris[0].shape[1], mris[0].shape[2]), nb_row=255, nb_col=176))
-model.add(Conv2D(64, (3, 3), activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.25))
-model.add(Flatten())
-model.add(Dense(128, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(num_classes, activation='softmax'))
-
-model.compile(loss=keras.losses.categorical_crossentropy,
-        optimizer=keras.optimizer.Adadelta(),
-        metrics=['accuracy'])
-
-model.fit(x_train, y_train,
-        batch_size=batch_size,
-        epochs=epochs,
-        verbose=1,
-        validation_data=(test_mris, test_classes))
-score = model.evaluate(test_mris, test_classes, verbose=0)
-print('Test loss: ', score[0])
+# print("Creating model...")
+# 
+# model = Sequential()
+# model.add(Conv2D(
+#     filters     = 32, 
+#     kernel_size = (3, 3), 
+#     activation  = 'relu',
+#     input_shape = (176, 256, 1)))
+# model.add(Conv2D(
+#     filters     = 64, 
+#     kernel_size = (3, 3), 
+#     activation  = 'relu'))
+# model.add(MaxPooling2D())
+# model.add(Dropout(
+#     rate = 0.25))
+# model.add(Dense(
+#     units       = 128, 
+#     activation  = 'relu'))
+# model.add(Dropout(
+#     rate = 0.5))
+# model.add(Dense(
+#     units       = num_classes, 
+#     activation  = 'softmax'))
+# 
+# model.compile(
+#     loss        = 'categorical_crossentropy',
+#     optimizer   = 'adadelta',
+#     metrics     = ['accuracy'])
+# 
+# model.fit(
+#     x               = train_mris, 
+#     y               = train_classes,
+#     batch_size      = batch_size,
+#     epochs          = epochs,
+#     verbose         = 1,
+#     validation_data = (test_mris, test_classes))
+# score = model.evaluate(
+#     x       = test_mris, 
+#     y       = test_classes, 
+#     verbose = 0)
+# 
+# print('Test loss: ', score[0])
 # print('Test accuracy: ', score[1])
