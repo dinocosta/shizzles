@@ -7,19 +7,26 @@ given MRI image.
 There are two classes:
     0 - No brain tissue can be seen on the MRI image.
     1 - Brain tissue can be seen on the MRI image.
+
+IMPORTANT NOTE:
+    If you are using Theano for the backend and need it to use the GPU
+    run this script as:
+
+    THEANO_FLAGS=device=gpu,floatX=float32 python bt-classifier.py
 """
 
-import numpy as np
-import nibabel as nib
-import os
-import keras
-from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
+import numpy as np
+import nibabel as nib
+import os
+import keras
+import psutil
+import time
 
-batch_size  = 128
+batch_size  = 2
 num_classes = 2
 epochs      = 1
 
@@ -91,19 +98,19 @@ model.add(Conv2D(
     kernel_size = (3, 3), 
     activation  = 'relu',
     input_shape = (176, 256, 1)))
-model.add(Conv2D(
-    filters     = 64, 
-    kernel_size = (3, 3), 
-    activation  = 'relu'))
+# model.add(Conv2D(
+#     filters     = 64, 
+#     kernel_size = (3, 3), 
+#     activation  = 'relu'))
 model.add(MaxPooling2D())
 model.add(Flatten())
 model.add(Dropout(
     rate = 0.25))
-model.add(Dense(
-    units       = 128, 
-    activation  = 'relu'))
-model.add(Dropout(
-    rate = 0.5))
+# model.add(Dense(
+#     units       = 128, 
+#     activation  = 'relu'))
+# model.add(Dropout(
+#     rate = 0.5))
 model.add(Dense(
     units       = num_classes, 
     activation  = 'softmax'))
@@ -113,7 +120,7 @@ model.compile(
     optimizer   = 'adadelta',
     metrics     = ['accuracy'])
 
-model.fit(
+history = model.fit(
     train_mris, 
     train_classes,
     batch_size      = batch_size,
@@ -125,5 +132,19 @@ score = model.evaluate(
     y       = test_classes, 
     verbose = 0)
 
-print('Test loss: ', score[0])
-print('Test accuracy: ', score[1])
+# Save model
+timestamp   = time.strftime("%Y%m%d-%H%M%S")
+model.save("logs/bt-classifier-" + timestamp + ".h5")
+
+# Log results
+p           = psutil.Process()
+cpu_time    = p.cpu_times()[0]
+mem         = p.memory_info()[0]
+with open("logs/bt-classifier.csv", "a") as log_file:
+    log_file.write(",")
+    log_file.write(",")
+    log_file.write("\"" + ascii(model).strip() + "\",")
+    log_file.write("{},".format(history.history['loss'][-1]))
+    log_file.write("{},".format(history.history['acc'][-1]))
+    log_file.write("{},".format(mem))
+    log_file.write("{},\n".format(cpu_time))
