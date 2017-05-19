@@ -28,7 +28,7 @@ import time
 
 batch_size  = 2
 num_classes = 2
-epochs      = 1
+epochs      = 3
 
 # Dataset path.
 MRIS_PATH = '/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris'
