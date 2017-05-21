@@ -1,11 +1,9 @@
 import os
 import numpy as np 
 from keras.models import load_model
-import normalization as norm
 import nibabel as nib
 
 trained_models = os.listdir("logs")
-trained_models.remove("log.txt")
 for i in range(len(trained_models)):
     print(str(i) + " - " + trained_models[i])
 
@@ -16,12 +14,12 @@ except ValueError:
 
 model = load_model("logs/" + trained_models[model_number])
 
-mri = nib.load("/home/dl_skull/normalized_images/SW3944C_str_crop_norm.nii.gz")
+mri = nib.load("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris/101_str_crop.nii.gz")
 affine = mri.affine
 mri = mri.get_data()
 
-mri = np.rollaxis(norm.normalize_image(mri), 2).reshape(mri.shape[2], 176, 256, 1)
+mri = np.rollaxis(mri, 2).reshape(mri.shape[2], 176, 256, 1)
 prediction = model.predict(mri)
 prediction = np.rollaxis(prediction, 0, 3).reshape(176, 256, mri.shape[0])
 prediction_img = nib.Nifti1Image(prediction, affine)
-nib.save(prediction_img, "teste.nii")
+nib.save(prediction_img, "prediction.nii")
