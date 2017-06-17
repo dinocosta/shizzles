@@ -20,7 +20,7 @@ affine = mri.affine
 mri = mri.get_data()
 
 mri = np.rollaxis(mri, 2).reshape(mri.shape[2], 176, 256, 1)
-prediction = model.predict(mri)
+prediction = model.predict(mri, batch_size=1)
 prediction = np.rollaxis(prediction, 0, 3).reshape(176, 256, mri.shape[0])
 
 prediction_img = nib.Nifti1Image(prediction, affine)
