@@ -156,3 +156,13 @@ Dice coefficient was used in this one,"InputLayer (None, 176, 256, 1)
              Dropout (None, 176, 256, 64)
                Dense (None, 176, 256, 16)
                Dense (None, 176, 256, 1)",-1.16964824919856,,,,"Accuracy, memory and CPU time not present due to error writing to log file"
++ (improved),"InputLayer (None, 176, 256, 1) 
+       ZeroPadding2D (None, 182, 262, 1) 
+              Conv2D (None, 180, 260, 64)
+             Dropout (None, 180, 260, 64)
+              Conv2D (None, 178, 258, 32)
+             Dropout (None, 178, 258, 32)
+              Conv2D (None, 176, 256, 64)
+               Dense (None, 176, 256, 32)
+               Dense (None, 176, 256, 16)
+               Dense (None, 176, 256, 1)",-0.779531179257454,0.936576114112708,20801200128,18497.14,Modified network topology. Prediction got better.
