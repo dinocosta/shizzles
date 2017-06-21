@@ -30,9 +30,9 @@ for i in range(len(mris_list)):
 print("Loading masks...")
 for i in range(len(mris_list)):
     filepath = "/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/masks/" + masks_list[i]
-    print(masks_list[i])
     file = nib.load(filepath).get_data()
     masks.append(file)
+
 
 # Concatenate exams on the samples axis
 mris = np.concatenate(mris, 2)
@@ -41,6 +41,14 @@ masks = np.concatenate(masks, 2)
 # Order the dimensions to have (samples, rows, cols, channels)
 mris = np.rollaxis(mris, 2).reshape(mris.shape[2], 176, 256, 1)
 masks = np.rollaxis(masks, 2).reshape(masks.shape[2], 176, 256, 1)
+
+# Remove exams that don't have brain tissue. Training only for those who do.
+no_brain_list = []
+for i in range(len(masks)):
+    if (np.max(masks[i]) == 0):
+        no_brain_list.append(i)
+masks = np.delete(masks, no_brain_list, axis=0)
+mris = np.delete(mris, no_brain_list, axis=0)
 
 # Split data for training and
 split_len = int(len(mris) * 0.8)
@@ -65,20 +73,19 @@ model.add(Dense(1, activation="sigmoid"))
 model.compile(loss='binary_crossentropy', optimizer='sgd', metrics=['accuracy'])
  
 # Train model
-history = model.fit(mris_training, masks_training, batch_size=8, epochs=50, verbose=1, validation_split=0.2)
-
+history = model.fit(mris_training, masks_training, batch_size=8, epochs=10, verbose=1, validation_split=0.2)
 p = psutil.Process()
 cpu_time = p.cpu_times()[0]
 mem = p.memory_info()[0]
+
+# Save Model
+timestamp = time.strftime("%Y%m%d-%H%M%S")
+model.save("logs/"+ timestamp + ".h5")
 
 # Evaluate model
 print("###########Evaluation############\n")
 scores = model.evaluate(mris_evaluate, masks_evaluate)
 print("\n Metric: %s: %.2f%%\n" % (model.metrics_names[1], scores[1]*100))
-
-# Save Model
-timestamp = time.strftime("%Y%m%d-%H%M%S")
-model.save("logs/"+ timestamp + ".h5")
 
 # Log results
 with open("logs/log.csv", "a") as myfile:
