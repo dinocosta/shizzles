@@ -1,4 +1,7 @@
 import os
+#Force application to run on CPU (good when there is not enough space in the GPU)
+#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
+#os.environ["CUDA_VISIBLE_DEVICES"] = ""
 import numpy as np 
 from keras.models import load_model
 import nibabel as nib
@@ -15,7 +18,9 @@ except ValueError:
 
 model = load_model("logs/" + trained_models[model_number], custom_objects={'dice_coef_loss': dice_coef_loss})
 
-mri = nib.load("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris/101_str_crop.nii.gz")
+#mri = nib.load("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris/101_str_crop.nii.gz")
+#mri = nib.load("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris/SW2173C_str_crop.nii.gz")
+mri = nib.load("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris/SW3944C_str_crop.nii.gz")
 affine = mri.affine
 mri = mri.get_data()
 

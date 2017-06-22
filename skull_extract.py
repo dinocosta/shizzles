@@ -52,6 +52,14 @@ if __name__ == "__main__":
     mris = np.rollaxis(mris, 2).reshape(mris.shape[2], 176, 256, 1)
     masks = np.rollaxis(masks, 2).reshape(masks.shape[2], 176, 256, 1)
 
+    # Remove exams that don't have brain tissue. Training only for those who do.
+    no_brain_list = []
+    for i in range(len(masks)):
+        if (np.max(masks[i]) == 0):
+            no_brain_list.append(i)
+    masks = np.delete(masks, no_brain_list, axis=0)
+    mris = np.delete(mris, no_brain_list, axis=0)
+
     # Split data for training and
     split_len = int(len(mris) * 0.8)
 
