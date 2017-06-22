@@ -32,6 +32,12 @@ if __name__ == "__main__":
     mris_list = sorted(os.listdir("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris"))
     masks_list = sorted(os.listdir("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/masks"))
 
+    s = (int(len(mris_list) * 0.8))
+    print("First test MRI: ", mris_list[s])
+    print("First test mask: ", masks_list[s])
+    print("Last test MRI: ", mris_list[-1])
+    print("Last test mask: ", masks_list[-1])
+
     print("Loading MRI's...")
     for i in range(len(mris_list)):
         filepath = "/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris/" + mris_list[i]
@@ -51,6 +57,14 @@ if __name__ == "__main__":
     # Order the dimensions to have (samples, rows, cols, channels)
     mris = np.rollaxis(mris, 2).reshape(mris.shape[2], 176, 256, 1)
     masks = np.rollaxis(masks, 2).reshape(masks.shape[2], 176, 256, 1)
+
+    # Remove exams that don't have brain tissue. Training only for those who do.
+    no_brain_list = []
+    for i in range(len(masks)):
+        if (np.max(masks[i]) == 0):
+            no_brain_list.append(i)
+    masks = np.delete(masks, no_brain_list, axis=0)
+    mris = np.delete(mris, no_brain_list, axis=0)
 
     # Split data for training and
     split_len = int(len(mris) * 0.8)
