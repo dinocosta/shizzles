@@ -42,7 +42,7 @@ Comparison (previous),Model,Loss,Accuracy,Memory,CPU Time,Observations
                Dense (None, 176, 256, 32)
                Dense (None, 176, 256, 16)
                Dense (None, 176, 256, 1)",0.160467026724429,0.930681609569317,20444991488,9104.42,
-best result without dice, due to long epochs. working - can be improved,"InputLayer (None, 176, 256, 1) 
+"best result without dice, due to long epochs. working - can be improved","InputLayer (None, 176, 256, 1) 
        ZeroPadding2D (None, 182, 262, 1) 
               Conv2D (None, 180, 260, 64)
              Dropout (None, 180, 260, 64)
