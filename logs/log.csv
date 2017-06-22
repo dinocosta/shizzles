@@ -199,3 +199,17 @@ Dice with filtered images and transpose with pooling,"InputLayer (None, 176, 256
                Dense (None, 176, 256, 32)
                Dense (None, 176, 256, 16)
                Dense (None, 176, 256, 1)",-0.8954939004164316,0.9548581497629746,15731150848,3094.8, 10 epochs and pixelized image
+More epochs than the last - 20 and with one more conv2d ,"InputLayer (None, 176, 256, 1) 
+       ZeroPadding2D (None, 184, 264, 1) 
+              Conv2D (None, 182, 262, 64)
+             Dropout (None, 182, 262, 64)
+              Conv2D (None, 180, 260, 32)
+        MaxPooling2D (None, 90, 130, 32) 
+     Conv2DTranspose (None, 92, 132, 16) 
+             Dropout (None, 92, 132, 16) 
+              Conv2D (None, 90, 130, 32) 
+              Conv2D (None, 88, 128, 64) 
+        UpSampling2D (None, 176, 256, 64)
+               Dense (None, 176, 256, 32)
+               Dense (None, 176, 256, 16)
+               Dense (None, 176, 256, 1)",-0.9191795691794437,0.9647736547583146,15810138112,10131.67,
