@@ -1,7 +1,7 @@
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten, ZeroPadding2D
-from keras.layers import Convolution2D, MaxPooling2D
+from keras.layers import Convolution2D, MaxPooling2D, UpSampling2D, Conv2DTranspose
 from keras.utils import np_utils
 from keras.datasets import mnist
 from keras_diagram import ascii
@@ -69,12 +69,16 @@ if __name__ == "__main__":
     masks_evaluate = masks[split_len:]
 
     model = Sequential()
-    model.add(ZeroPadding2D(padding=(3, 3), input_shape=(176, 256, 1)))
+    model.add(ZeroPadding2D(padding=(4, 4), input_shape=(176, 256, 1)))
     model.add(Convolution2D(64, 3, activation="relu"))
     model.add(Dropout(0.2))
     model.add(Convolution2D(32, 3, activation="relu"))
+    model.add(MaxPooling2D(2))
+    model.add(Conv2DTranspose(16, 3, padding="valid", activation="relu"))
     model.add(Dropout(0.2))
+    model.add(Convolution2D(32, 3, activation="relu"))
     model.add(Convolution2D(64, 3, activation="relu"))
+    model.add(UpSampling2D(2))
     model.add(Dense(32, activation="relu"))
     model.add(Dense(16, activation="relu"))
     model.add(Dense(1, activation="sigmoid"))
@@ -83,7 +87,7 @@ if __name__ == "__main__":
     model.compile(loss=dice_coef_loss, optimizer='sgd', metrics=['accuracy'])
      
     # Train model
-    history = model.fit(mris_training, masks_training, batch_size=8, epochs=20, verbose=1, validation_split=0.2)
+    history = model.fit(mris_training, masks_training, batch_size=8, epochs=10, verbose=1, validation_split=0.2)
 
     p = psutil.Process()
     cpu_time = p.cpu_times()[0]
