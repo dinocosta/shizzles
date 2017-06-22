@@ -32,12 +32,6 @@ if __name__ == "__main__":
     mris_list = sorted(os.listdir("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris"))
     masks_list = sorted(os.listdir("/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/masks"))
 
-    s = (int(len(mris_list) * 0.8))
-    print("First test MRI: ", mris_list[s])
-    print("First test mask: ", masks_list[s])
-    print("Last test MRI: ", mris_list[-1])
-    print("Last test mask: ", masks_list[-1])
-
     print("Loading MRI's...")
     for i in range(len(mris_list)):
         filepath = "/mnt/disk3/datasets_rm/data_set_skull/dl_skull_trab/mris/" + mris_list[i]
